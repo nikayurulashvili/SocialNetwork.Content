@@ -1,0 +1,32 @@
+using SocialNetwork.Content.Services.Abstractions.Persistence;
+namespace SocialNetwork.Content.Repositories.Persistence.Repositories;
+public class UnitOfWork : IUnitOfWork
+{
+    private readonly ContentDbContext _context;
+    private readonly Lazy<IPostRepository> _posts;
+    private readonly Lazy<IPostAudienceRepository> _postAudiences;
+    private readonly Lazy<ICommentRepository> _comments;
+    private readonly Lazy<IPostLikeRepository> _postLikes;
+    private readonly Lazy<IUserReplicaRepository> _userReplicas;
+    private readonly Lazy<IInboxMessageRepository> _inboxMessages;
+    private readonly Lazy<IOutboxMessageRepository> _outboxMessages;
+    public IPostRepository Posts => _posts.Value;
+    public IPostAudienceRepository PostAudiences => _postAudiences.Value;
+    public ICommentRepository Comments => _comments.Value;
+    public IPostLikeRepository PostLikes => _postLikes.Value;
+    public IUserReplicaRepository UserReplicas => _userReplicas.Value;
+    public IInboxMessageRepository InboxMessages => _inboxMessages.Value;
+    public IOutboxMessageRepository OutboxMessages => _outboxMessages.Value;
+    public UnitOfWork(ContentDbContext context)
+    {
+        _context = context;
+        _posts = new Lazy<IPostRepository>(() => new PostRepository(_context));
+        _postAudiences = new Lazy<IPostAudienceRepository>(() => new PostAudienceRepository(_context));
+        _comments = new Lazy<ICommentRepository>(() => new CommentRepository(_context));
+        _postLikes = new Lazy<IPostLikeRepository>(() => new PostLikeRepository(_context));
+        _userReplicas = new Lazy<IUserReplicaRepository>(() => new UserReplicaRepository(_context));
+        _inboxMessages = new Lazy<IInboxMessageRepository>(() => new InboxMessageRepository(_context));
+        _outboxMessages = new Lazy<IOutboxMessageRepository>(() => new OutboxMessageRepository(_context));
+    }
+    public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
+}

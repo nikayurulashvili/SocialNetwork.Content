@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><TargetFramework>net10.0</TargetFramework><IsPackable>false</IsPackable><IsTestProject>true</IsTestProject><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup>
+<ItemGroup><PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" /><PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.11" /><PackageReference Include="xunit" Version="2.9.3" /><PackageReference Include="xunit.runner.visualstudio" Version="3.1.5"><PrivateAssets>all</PrivateAssets><IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets></PackageReference></ItemGroup>
+<ItemGroup><ProjectReference Include="..\SocialNetwork.Content.Services\SocialNetwork.Content.Services.csproj" /><ProjectReference Include="..\SocialNetwork.Content.Repositories\SocialNetwork.Content.Repositories.csproj" /><ProjectReference Include="..\SocialNetwork.Content.Entities\SocialNetwork.Content.Entities.csproj" /><ProjectReference Include="..\SocialNetwork.Content.Contracts\SocialNetwork.Content.Contracts.csproj" /></ItemGroup>
+</Project>
