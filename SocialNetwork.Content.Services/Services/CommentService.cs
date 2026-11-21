@@ -37,10 +37,6 @@ public class CommentService : ICommentService
             if (post.IsDeleted)
                 throw new NotFoundException("Post not found.");
 
-            if (post.IsDeleted)
-                throw new ForbiddenException(
-                    "Cannot comment on deleted post.");
-
             var author = await _unitOfWork.UserReplicas
                 .GetByIdAsync(authorId);
 
@@ -105,8 +101,6 @@ public class CommentService : ICommentService
             comment.Text = request.Text.Trim();
             comment.UpdatedAt = DateTime.UtcNow;
 
-            await _unitOfWork.Comments.UpdateAsync(comment);
-
             await AddOutboxAsync(
                 "comment.updated",
                 new CommentUpdatedEvent
@@ -150,7 +144,7 @@ public class CommentService : ICommentService
 
             var deletedAt = DateTime.UtcNow;
 
-            await _unitOfWork.Comments.SoftDeleteAsync(comment);
+            await _unitOfWork.Comments.SoftDeleteAsync(commentId);
 
             await AddOutboxAsync(
                 "comment.deleted",
@@ -180,10 +174,12 @@ public class CommentService : ICommentService
         if (post is null || post.IsDeleted)
             throw new NotFoundException("Post not found.");
 
-        return await _unitOfWork.Comments
-            .GetCommentsByPostIdAsync(postId)
+        var comments = await _unitOfWork.Comments
+            .GetCommentsByPostIdAsync(postId);
+
+        return comments
             .Select(Map)
-            .ToListAsync();
+            .ToList();
     }
 
     private async Task AddOutboxAsync<T>(
@@ -217,7 +213,7 @@ public class CommentService : ICommentService
     {
         if (string.IsNullOrWhiteSpace(text) || text.Trim().Length > 500)
         {
-            throw new RequestValidationException(
+            throw new RequestValidateException(
                 "Comment text is required and cannot exceed 500 characters.");
         }
     }
