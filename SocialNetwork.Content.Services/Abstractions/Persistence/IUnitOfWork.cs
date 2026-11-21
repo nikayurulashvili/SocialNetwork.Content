@@ -9,4 +9,7 @@ public interface IUnitOfWork
     IInboxMessageRepository InboxMessages { get; }
     IOutboxMessageRepository OutboxMessages { get; }
     Task<int> SaveChangesAsync();
+    Task BeginTransactionAsync();
+    Task CommitTransactionAsync();
+    Task RollbackTransactionAsync();
 }

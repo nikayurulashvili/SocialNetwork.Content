@@ -2,7 +2,9 @@ using SocialNetwork.Content.Services.Abstractions.Persistence;
 using SocialNetwork.Content.Services.Abstractions.Services;
 using SocialNetwork.Content.Entities.Entities;
 
+
 namespace SocialNetwork.Content.Services.Services;
+
 
 public class UserEventsService : IUserEventsService
 {
@@ -23,48 +25,41 @@ public class UserEventsService : IUserEventsService
         return ApplyUserStateAsync(messageId, userId, isActive, ct);
     }
 
-    public async Task HandleUserDeletedAsync(Guid messageId, Guid userId, CancellationToken ct = default)
+    public Task HandleUserDeletedAsync(Guid messageId, Guid userId, CancellationToken ct = default)
     {
-        if (await _unitOfWork.InboxMessages.ExistsAsync(messageId))
-        {
-            return;
-        }
-
-        // Deleted event may arrive before UserCreated; keep an inactive replica either way.
-        await _unitOfWork.UserReplicas.AddOrUpdateAsync(new UserReplica
-        {
-            UserId = userId,
-            IsActive = false
-        });
-
-        await _unitOfWork.InboxMessages.AddAsync(new InboxMessage
-        {
-            MessageId = messageId,
-            ProcessedAt = DateTime.UtcNow
-        });
-
-        await _unitOfWork.SaveChangesAsync();
+        return ApplyUserStateAsync(messageId, userId, false, ct);
     }
 
     private async Task ApplyUserStateAsync(Guid messageId, Guid userId, bool isActive, CancellationToken ct)
     {
-        if (await _unitOfWork.InboxMessages.ExistsAsync(messageId))
+        await _unitOfWork.BeginTransactionAsync();
+        try
         {
-            return;
+            // Inbox idempotency check and replica update are kept in one transaction.
+            if (await _unitOfWork.InboxMessages.ExistsAsync(messageId))
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                return;
+            }
+
+            await _unitOfWork.UserReplicas.AddOrUpdateAsync(new UserReplica
+            {
+                UserId = userId,
+                IsActive = isActive
+            });
+
+            await _unitOfWork.InboxMessages.AddAsync(new InboxMessage
+            {
+                MessageId = messageId,
+                ProcessedAt = DateTime.UtcNow
+            });
+
+            await _unitOfWork.CommitTransactionAsync();
         }
-
-        await _unitOfWork.UserReplicas.AddOrUpdateAsync(new UserReplica
+        catch
         {
-            UserId = userId,
-            IsActive = isActive
-        });
-
-        await _unitOfWork.InboxMessages.AddAsync(new InboxMessage
-        {
-            MessageId = messageId,
-            ProcessedAt = DateTime.UtcNow
-        });
-
-        await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
     }
 }

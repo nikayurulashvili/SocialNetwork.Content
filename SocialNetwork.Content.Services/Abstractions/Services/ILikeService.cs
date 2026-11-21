@@ -4,4 +4,6 @@ public interface ILikeService
 {
     Task<LikeResponse> LikePostAsync(Guid postId, Guid userId);
     Task<LikeResponse> UnlikePostAsync(Guid postId, Guid userId);
+
+
 }
