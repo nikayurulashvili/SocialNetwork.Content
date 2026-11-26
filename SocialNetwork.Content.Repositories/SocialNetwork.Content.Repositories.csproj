@@ -10,7 +10,4 @@
 <ProjectReference Include="..\SocialNetwork.Content.Entities\SocialNetwork.Content.Entities.csproj" />
 <ProjectReference Include="..\SocialNetwork.Content.Services\SocialNetwork.Content.Services.csproj" />
 <ProjectReference Include="..\SocialNetwork.EventBus\SocialNetwork.EventBus.csproj" />
-</ItemGroup>
-<ItemGroup>
-  <Folder Include="RabbitMq\Consumers\" />
 </ItemGroup></Project>
