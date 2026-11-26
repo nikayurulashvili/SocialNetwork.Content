@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using SocialNetwork.Content.Api.Consumers;
 using SocialNetwork.Content.Repositories.Persistence;
-using SocialNetwork.Content.Repositories.Persistence.EventBus;
 using SocialNetwork.Content.Repositories.Persistence.Repositories;
+using SocialNetwork.Content.Repositories.RabbitMq.Outbox;
 using SocialNetwork.Content.Services.Abstractions.Persistence;
 using SocialNetwork.Content.Services.Abstractions.Services;
 using SocialNetwork.Content.Services.Services;
@@ -43,7 +43,7 @@ public partial class Program
             AutomaticRecoveryEnabled = true,
         });
 
-        builder.Services.AddOutboxPublisher<ContentOutboxStore>("socialnetwork.events");
+        builder.Services.AddOutboxPublisher<OutboxStore>("socialnetwork.events");
         builder.Services.AddConsumer<UserCreatedConsumer>();
         builder.Services.AddConsumer<UserUpdatedConsumer>();
         builder.Services.AddConsumer<UserDeletedConsumer>();

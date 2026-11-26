@@ -3,10 +3,10 @@ using SocialNetwork.Content.Entities.Entities;
 using SocialNetwork.EventBus.Outbox;
 using SocialNetwork.Content.Repositories.Persistence;
 
-namespace SocialNetwork.Content.Repositories.Persistence.EventBus;
+namespace SocialNetwork.Content.Repositories.RabbitMq.Outbox;
 
 /// <summary>Adapts Content's EF Outbox table to the EventBus publisher contract.</summary>
-public sealed class ContentOutboxStore(ContentDbContext db) : IOutboxStore
+public sealed class OutboxStore(ContentDbContext db) : IOutboxStore
 {
     public async Task<IReadOnlyList<OutboxEnvelope>> GetPendingAsync(int take, CancellationToken ct)
     {

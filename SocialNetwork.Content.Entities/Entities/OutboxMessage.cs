@@ -8,4 +8,6 @@ public sealed class OutboxMessage
     public DateTime OccurredAt { get; set; }
     public DateTime? ProcessedAt { get; set; }
     public string? LastError { get; set; }
+
+    public int Attempts { get; set; }
 }
